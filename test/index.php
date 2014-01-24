@@ -23,8 +23,6 @@ while (false !== ($entry = $directory->read())) {
 	}
 }
 
-
-
 foreach (array_unique($fileNameList) as $fileName) {
 	$output .= file_get_contents('../src/' . $fileName) . "\r\n";
 }
@@ -58,6 +56,7 @@ file_put_contents($outputFileName, $output);
 		var stage = new Kinetic.Stage({width : 640, height : 480, container : 'stage'});
 		var layer = new Kinetic.Layer();
 		var button = new KineticUI.Button({text:'Button'});
+		button.click = function(){ if (console && console.log) console.log('Button click'); };
 		stage.add(layer);
 		layer.add(button);
 		stage.batchDraw();

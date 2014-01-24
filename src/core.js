@@ -15,5 +15,10 @@ var KineticUI = {
 				if (console.error) console.error(str);
 			}
 		}
+	},
+	preventEvent : function(event){
+		event.cancelBubble = true;
+		event.stopPropagation();
+		event.preventDefault();
 	}
 };
