@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>KineticUI test</title>
+	<script type="text/javascript" src="./kinetic-v5.0.0.min.js"></script>
+	<script type="text/javascript" src="./kineticui-0.1.0.js"></script>
+</head>
+<body>
+	<div id="stage" style="display:block;height:100%;width:100%;"></div>
+
+	<script type="text/javascript">
+		KineticUI.enableTrace();
+		var stage = new Kinetic.Stage({width : 640, height : 480, container : 'stage'});
+		var layer = new Kinetic.Layer();
+		stage.add(layer);
+
+		var button_1 = new KineticUI.Button({text:'Disable >', width:250});
+		button_1.click = function(){
+			if (button_2.disabled){
+				button_1.text('Disable >');
+				button_2.enable();
+			} else {
+				button_1.text('Enable >');
+				button_2.disable();
+			}
+		};
+		layer.add(button_1);
+
+		var button_2 = new KineticUI.Button({text:'Button', x:button_1.width() + 5});
+		button_2.click = function(){
+			if (console && console.log) console.log('Button click');
+		};
+		layer.add(button_2);
+
+		stage.batchDraw();
+	</script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 
 */
 
-$outputFileName = 'kineticui.js';
+$outputFileName = 'kineticui-0.1.0.js';
 
 $minify = false;
 $compilation_level = 'SIMPLE_OPTIMIZATIONS'; // WHITESPACE_ONLY, SIMPLE_OPTIMIZATIONS or ADVANCED_OPTIMIZATIONS
@@ -27,6 +27,8 @@ foreach (array_unique($fileNameList) as $fileName) {
 	$output .= file_get_contents('../src/' . $fileName) . "\r\n";
 }
 
+file_put_contents($outputFileName, $output);
+
 if ($minify) {
 	$curl = curl_init('http://closure-compiler.appspot.com/compile');
 	curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
@@ -36,30 +38,8 @@ if ($minify) {
 	curl_setopt($curl, CURLOPT_POSTFIELDS, 'language=ECMASCRIPT5&output_info=compiled_code&output_format=text&compilation_level=' . $compilation_level . '&js_code=' . urlencode($output));
 	$output = trim(curl_exec($curl));
 	curl_close($curl);
+	file_put_contents(str_replace('.js', '.min.js', $outputFileName), $output);
 }
 
-file_put_contents($outputFileName, $output);
-
+include('./test.html');
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-	<title>KineticUI test</title>
-	<script type="text/javascript" src="./kinetic-v5.0.0.min.js"></script>
-	<script type="text/javascript" src="./kineticui.js"></script>
-</head>
-<body>
-	<div id="stage" style="display:block;height:100%;width:100%;"></div>
-
-	<script type="text/javascript">
-		KineticUI.enableTrace();
-		var stage = new Kinetic.Stage({width : 640, height : 480, container : 'stage'});
-		var layer = new Kinetic.Layer();
-		var button = new KineticUI.Button({text:'Button'});
-		button.click = function(){ if (console && console.log) console.log('Button click'); };
-		stage.add(layer);
-		layer.add(button);
-		stage.batchDraw();
-	</script>
-</body>
-</html>

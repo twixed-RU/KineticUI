@@ -1,6 +1,7 @@
 KineticUI.Config = {
 
 	button : {
+		cornerRadius : 5,
 		fill : {
 			up : {
 				startPoint: {x:0, y:15},
@@ -35,7 +36,6 @@ KineticUI.Config = {
 			style : 'bold'
 		},
 		height : 32,
-		radius : 5,
 		padding : 40
 	}
 

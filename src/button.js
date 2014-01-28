@@ -4,34 +4,36 @@ KineticUI.Button = function(config){
 
 KineticUI.Button.prototype = {
 	____init : function(config){
-		if (!config) config = {};
-		if (!config.text) config.text = '';
-		if (!config.height) config.height = KineticUI.Config.button.height;
-		if (!config.padding) config.padding = KineticUI.Config.button.padding;
-		if (!config.radius) config.radius = KineticUI.Config.button.radius;
-		this.___init();
-		this.text = new Kinetic.Text({
-			text : config.text,
-			fontFamily : KineticUI.Config.button.font.family,
-			fontSize : KineticUI.Config.button.font.size,
-			fill : KineticUI.Config.button.font.color.up,
-			fontStyle : KineticUI.Config.button.font.style
+		this._config = KineticUI.extend(KineticUI.Config.button, config, true);
+
+		this._text = new Kinetic.Text({
+			text : this._config.text,
+			fontFamily : this._config.font.family,
+			fontSize : this._config.font.size,
+			fill : this._config.font.color.up,
+			fontStyle : this._config.font.style
 		});
 
-		if (!config.width) config.width = this.text.width() + config.padding * 2;
-		this.background = new Kinetic.Rect({
-			cornerRadius : config.radius,
-			height : config.height,
-			width : config.width,
-			fillLinearGradientStartPoint : KineticUI.Config.button.fill.up.startPoint,
-			fillLinearGradientEndPoint : KineticUI.Config.button.fill.up.endPoint,
-			fillLinearGradientColorStops : KineticUI.Config.button.fill.up.colorStops,
+		if (!this._config.width) this._config.width = this._text.width() + this._config.padding * 2;
+
+		this.___init(this._config);
+
+		this._background = new Kinetic.Rect({
+			cornerRadius : this._config.cornerRadius,
+			height : this._config.height,
+			width : this._config.width,
+			fillLinearGradientStartPoint : this._config.fill.up.startPoint,
+			fillLinearGradientEndPoint : this._config.fill.up.endPoint,
+			fillLinearGradientColorStops : this._config.fill.up.colorStops,
 			fillPriority : 'linear-gradient'
 		});
-		this.add(this.background);
-		this.add(this.text);
-		this.setSize(this.background.getSize());
-		this.text.position({x:config.padding, y:(this.background.height() - this.text.height()) / 2});
+		this.add(this._background);
+		this.add(this._text);
+
+		this._text.position({
+			x:(this.width() - this._text.width()) / 2,
+			y:(this._background.height() - this._text.height()) / 2
+		});
 
 		this.disabled = false;
 		this.pressed = false;
@@ -44,16 +46,20 @@ KineticUI.Button.prototype = {
 		this.on('click touchend',this.mouseClick);
 	},
 	batchDraw : function(){
+		this._text.position({
+			x:(this.width() - this._text.width()) / 2,
+			y:(this._background.height() - this._text.height()) / 2
+		});
 		if (this.parent) if (this.parent.batchDraw) this.parent.batchDraw();
 	},
 	colorScheme : function(scheme){
-		this.background.setAttrs({
-			fillLinearGradientStartPoint : KineticUI.Config.button.fill[scheme].startPoint,
-			fillLinearGradientEndPoint : KineticUI.Config.button.fill[scheme].endPoint,
-			fillLinearGradientColorStops : KineticUI.Config.button.fill[scheme].colorStops		
+		this._background.setAttrs({
+			fillLinearGradientStartPoint : this._config.fill[scheme].startPoint,
+			fillLinearGradientEndPoint : this._config.fill[scheme].endPoint,
+			fillLinearGradientColorStops : this._config.fill[scheme].colorStops		
 		});
-		this.text.setAttrs({
-			fill : KineticUI.Config.button.font.color[scheme]
+		this._text.setAttrs({
+			fill : this._config.font.color[scheme]
 		});
 		this.batchDraw();
 	},
@@ -91,6 +97,10 @@ KineticUI.Button.prototype = {
 	enable : function(){
 		this.disabled = false;
 		this.colorScheme('up');
+	},
+	text : function(str){
+		this._text.text(str);
+		this.batchDraw();
 	}
 };
 
