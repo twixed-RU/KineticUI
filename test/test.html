@@ -19,9 +19,11 @@
 			if (button_2.disabled){
 				button_1.text('Disable >');
 				button_2.enable();
+				input.enable();
 			} else {
 				button_1.text('Enable >');
 				button_2.disable();
+				input.disable();
 			}
 		};
 		layer.add(button_1);
@@ -31,6 +33,9 @@
 			if (console && console.log) console.log('Button click');
 		};
 		layer.add(button_2);
+
+		var input = new KineticUI.Input({placeholder:'Text input', width:button_1.width() + button_2.width() + 5, y:button_1.height() + 5});
+		layer.add(input);
 
 		stage.batchDraw();
 	</script>

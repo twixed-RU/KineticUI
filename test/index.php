@@ -12,7 +12,7 @@ $outputFileName = 'kineticui-0.1.0.js';
 $minify = false;
 $compilation_level = 'SIMPLE_OPTIMIZATIONS'; // WHITESPACE_ONLY, SIMPLE_OPTIMIZATIONS or ADVANCED_OPTIMIZATIONS
 
-$fileNameList = array('core.js','config.js');
+$fileNameList = array('core.js','config.js','event.js');
 
 $output = "";
 

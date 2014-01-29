@@ -1,0 +1,3 @@
+KineticUI.Event = function(){
+	
+};
