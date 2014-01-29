@@ -151,17 +151,33 @@ KineticUI.Config = {
 				disabled : '#999999'
 			},
 			enabled : true,
-			size : 1
+			size : 0.5
 		},
-		padding : 5,
+		padding : 7,
 		width : 150
 	}
 
 };
 
-KineticUI.Event = function(){
-	
+KineticUI.Event = {
+	_blur : null,
+	blur : function(object){
+		if (!this._blur) { KineticUI.trace('ui_blur event is not set up',true); return; }
+		if (object) {
+			this._blur.target = object;
+			window.dispatchEvent(this._blur);
+		} else
+			return this._blur.type;
+	}
 };
+
+// if (document.createEvent) {
+// 	KineticUI.Event._blur = document.createEvent('Event'); KineticUI.Event._blur.initEvent('ui_blur', true, true);
+// } else {
+// 	KineticUI.Event._blur = new CustomEvent('ui_blur',{bubbles:true,cancelable:true});
+// }
+
+
 KineticUI.Button = function(config){
 	this.____init(config);
 };
@@ -252,6 +268,7 @@ KineticUI.Button.prototype = {
 	},
 	mouseClick : function(e){
 		if (this.disabled) return;
+		KineticUI.Event.blur(this);
 		if (this.click) this.click(e);
 	},
 	disable : function(){
@@ -276,6 +293,7 @@ KineticUI.Input = function(config){
 
 KineticUI.Input.prototype = {
 	____init : function(config){
+		var self = this;
 		this._config = KineticUI.extend(KineticUI.Config.input, config, true);
 
 		this.___init(this._config);
@@ -290,7 +308,7 @@ KineticUI.Input.prototype = {
 			fillPriority : 'linear-gradient',
 			strokeEnabled : this._config.stroke.enabled,
 			stroke : this._config.stroke.color.normal,
-			strokeSize : this._config.stroke.size
+			strokeWidth : this._config.stroke.size
 		});
 		this.add(this._background);
 
@@ -304,6 +322,17 @@ KineticUI.Input.prototype = {
 		});
 		this.add(this._placeholder);
 
+		if (!this._config.text) this._config.text = '';
+		this._text = new Kinetic.Text({
+			text : this._config.text,
+			fontFamily : this._config.font.family,
+			fontSize : this._config.font.size,
+			fill : this._config.font.color.normal,
+			x : this._config.padding,
+			y : this._config.padding
+		});
+		this.add(this._text);
+
 		this.disabled = false;
 		this.pressed = false;
 		this.hovered = false;
@@ -314,12 +343,12 @@ KineticUI.Input.prototype = {
 		this.on('mousedown touchstart',this.mouseDown);
 		this.on('mouseup touchend',this.mouseUp);
 		this.on('click touchend',this.mouseClick);
+
+		window.addEventListener(KineticUI.Event.blur(), function(e){
+			if(e.target != self) self.blur();
+		});
 	},
 	batchDraw : function(){
-		// this._text.position({
-		// 	x:(this.width() - this._text.width()) / 2,
-		// 	y:(this._background.height() - this._text.height()) / 2
-		// });
 		if (this.parent) if (this.parent.batchDraw) this.parent.batchDraw();
 	},
 	colorScheme : function(scheme){
@@ -328,11 +357,11 @@ KineticUI.Input.prototype = {
 			fillLinearGradientEndPoint : this._config.fill[scheme].endPoint,
 			fillLinearGradientColorStops : this._config.fill[scheme].colorStops,
 			stroke : this._config.stroke.color[scheme],
-			strokeSize : this._config.stroke
+			strokeWidth : this._config.stroke.size
 		});
-		// this._text.setAttrs({
-		// 	fill : this._config.font.color[scheme]
-		// });
+		this._text.setAttrs({
+			fill : this._config.font.color[scheme]
+		});
 		this.batchDraw();
 	},
 	mouseOver : function(e){
@@ -353,9 +382,8 @@ KineticUI.Input.prototype = {
 	},
 	mouseDown : function(e){
 		if (this.disabled) return;
-		this.colorScheme('focus');
 		this.pressed = true;
-		this.focused = true;
+		this.focus();
 	},
 	mouseUp : function(e){
 		if (this.disabled) return;
@@ -381,8 +409,28 @@ KineticUI.Input.prototype = {
 		this.colorScheme('normal');
 	},
 	text : function(str){
-		this._text.text(str);
-		this.batchDraw();
+		if (str) {
+			this._text.text(str);
+			this.batchDraw();
+		} else  {
+			return this._text.text();
+		}
+	},
+	focus : function(){
+		this.colorScheme('focus');
+		this._placeholder.hide();
+		this.focused = true;
+	},
+	blur : function(){
+		if (this.hovered)
+			this.colorScheme('hover');
+		else
+			if (this.disabled)
+				this.colorScheme('disabled');
+			else
+				this.colorScheme('normal');
+		if (this.text() === '') this._placeholder.show();
+		this.focused = false;
 	}
 };
 

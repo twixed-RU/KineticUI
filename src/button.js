@@ -88,6 +88,7 @@ KineticUI.Button.prototype = {
 	},
 	mouseClick : function(e){
 		if (this.disabled) return;
+		KineticUI.Event.blur(this);
 		if (this.click) this.click(e);
 	},
 	disable : function(){
