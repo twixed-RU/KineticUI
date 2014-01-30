@@ -108,6 +108,11 @@ KineticUI.Config = {
 
 	input : {
 		cornerRadius : 5,
+		cursor : {
+			color : '#000000',
+			interval : 250,
+			width : 1
+		},
 		fill : {
 			normal : {
 				startPoint: {x:0, y:15},
@@ -163,7 +168,7 @@ KineticUI.Event = {
 	_blur : null,
 	blur : function(object){
 		if (!this._blur) {
-			KineticUI.trace('ui_blur event is not set up',true);
+			KineticUI.trace('ui_blur event is not set up', true);
 			return;
 		} else
 			if (object) {
@@ -301,6 +306,8 @@ KineticUI.Input.prototype = {
 
 		this.___init(this._config);
 
+		this.clip({x:0, y:0, width:this._config.width, height : this._config.height});
+
 		this._background = new Kinetic.Rect({
 			cornerRadius : this._config.cornerRadius,
 			height : this._config.height,
@@ -336,6 +343,32 @@ KineticUI.Input.prototype = {
 		});
 		this.add(this._text);
 
+		this._cursor = new Kinetic.Rect({
+			height : 1,
+			fill : KineticUI.Config.input.cursor.color,
+			width : KineticUI.Config.input.cursor.width
+		});
+		this.add(this._cursor);
+		this._cursor.time = 0;
+		this._cursor.hide();
+
+		var anim = new Kinetic.Animation(function(frame){
+			if (!this.target.focused) return;
+			if (frame.lastTime - this.target._cursor.time >= this.target._config.cursor.interval) {
+				this.target._cursor.time = frame.lastTime;
+				if (this.target._cursor.isVisible()) {
+					this.target._cursor.hide();
+				} else {
+					this.target._cursor.show();
+				}
+				// this.target.update();
+				this.target.batchDraw();
+			}
+		});
+		anim.target = this;
+		anim.start();
+
+
 		this.disabled = false;
 		this.pressed = false;
 		this.hovered = false;
@@ -345,14 +378,23 @@ KineticUI.Input.prototype = {
 		this.on('mouseout',this.mouseLeave);
 		this.on('mousedown touchstart',this.mouseDown);
 		this.on('mouseup touchend',this.mouseUp);
-		this.on('click touchend',this.mouseClick);
 
 		window.addEventListener(KineticUI.Event.blur(), function(e){
 			if(e.target != self) self.blur();
 		});
+		window.addEventListener('keydown',function(e){
+			self.keyDown(e);
+		});
+		window.addEventListener('keypress',function(e){
+			self.keyPress(e);
+		});
 	},
 	batchDraw : function(){
-		if (this.parent) if (this.parent.batchDraw) this.parent.batchDraw();
+		if (this.parent && this.parent.batchDraw) {
+			this._cursor.position({x:this._text.position().x + this._text.width(),y:this._text.position().y});
+			this._cursor.height(this._text.height());
+			this.parent.batchDraw();
+		}
 	},
 	colorScheme : function(scheme){
 		this._background.setAttrs({
@@ -398,9 +440,38 @@ KineticUI.Input.prototype = {
 			this.colorScheme('normal');
 		this.pressed = false;
 	},
-	mouseClick : function(e){
-		if (this.disabled) return;
-		if (this.click) this.click(e);
+	keyDown : function(e){
+		if (!this.focused) return;
+		e = e || window.event;
+		var key = e.keyCode || e.which;
+		var charStr = String.fromCharCode(key);
+		var letter = (e.charCode && !e.altKey && !e.ctrlKey);
+		var str = this.text();
+		switch(key) {
+			case 8 : // backspace
+				str = str.substring(0, str.length - 1);
+				KineticUI.preventEvent(e);
+				break;
+		}
+		this.text(str);
+	},
+	keyPress : function(e){
+		if (!this.focused) return;
+		e = e || window.event;
+		var key = e.keyCode || e.which;
+		var charStr = String.fromCharCode(key);
+		var letter = (e.charCode && !e.altKey && !e.ctrlKey);
+		var str = this.text();
+		switch(key) { // somehow we need a separate event handler here
+			case 8 : // backspace
+				str = str.substring(0, str.length - 1);
+				KineticUI.preventEvent(e);
+				break;
+		}
+		if (letter) {
+			str += charStr;
+			this.text(str);
+		}
 	},
 	disable : function(){
 		this.disabled = true;
@@ -412,7 +483,11 @@ KineticUI.Input.prototype = {
 		this.colorScheme('normal');
 	},
 	text : function(str){
-		if (str) {
+		if (str !== undefined) {
+			if (str === '' && !this.focused)
+				this._placeholder.show();
+			else
+				this._placeholder.hide();
 			this._text.text(str);
 			this.batchDraw();
 		} else  {
@@ -420,6 +495,7 @@ KineticUI.Input.prototype = {
 		}
 	},
 	focus : function(){
+		KineticUI.Event.blur(this);
 		this.colorScheme('focus');
 		this._placeholder.hide();
 		this.focused = true;
@@ -433,6 +509,7 @@ KineticUI.Input.prototype = {
 			else
 				this.colorScheme('normal');
 		if (this.text() === '') this._placeholder.show();
+		this._cursor.hide();
 		this.focused = false;
 	}
 };

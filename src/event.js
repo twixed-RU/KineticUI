@@ -2,7 +2,7 @@ KineticUI.Event = {
 	_blur : null,
 	blur : function(object){
 		if (!this._blur) {
-			KineticUI.trace('ui_blur event is not set up',true);
+			KineticUI.trace('ui_blur event is not set up', true);
 			return;
 		} else
 			if (object) {

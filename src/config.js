@@ -41,6 +41,11 @@ KineticUI.Config = {
 
 	input : {
 		cornerRadius : 5,
+		cursor : {
+			color : '#000000',
+			interval : 250,
+			width : 1
+		},
 		fill : {
 			normal : {
 				startPoint: {x:0, y:15},

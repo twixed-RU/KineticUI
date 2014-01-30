@@ -19,11 +19,11 @@
 			if (button_2.disabled){
 				button_1.text('Disable >');
 				button_2.enable();
-				input.enable();
+				input_1.enable();
 			} else {
 				button_1.text('Enable >');
 				button_2.disable();
-				input.disable();
+				input_1.disable();
 			}
 		};
 		layer.add(button_1);
@@ -34,8 +34,11 @@
 		};
 		layer.add(button_2);
 
-		var input = new KineticUI.Input({placeholder:'Text input', width:button_1.width() + button_2.width() + 5, y:button_1.height() + 5});
-		layer.add(input);
+		var input_1 = new KineticUI.Input({placeholder:'First text input', width:button_1.width() + button_2.width() + 5, y:button_1.height() + 5});
+		layer.add(input_1);
+
+		var input_2 = new KineticUI.Input({placeholder:'Second text input', width:input_1.width(), y:input_1.position().y + input_1.height() + 5});
+		layer.add(input_2);
 
 		stage.batchDraw();
 	</script>
