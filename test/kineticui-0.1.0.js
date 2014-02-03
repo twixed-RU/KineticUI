@@ -16,6 +16,13 @@ var KineticUI = {
 			}
 		}
 	},
+	uniqid : function() {
+		var ts = String(new Date().getTime()), i = 0, out = '';
+		for(i = 0; i < ts.length; i += 2) {
+		   out += Number(ts.substr(i, 2)).toString(36);
+		}
+		return out;
+	},
 	preventEvent : function(event){
 		event.cancelBubble = true;
 		event.stopPropagation();
@@ -156,7 +163,7 @@ KineticUI.Config = {
 				disabled : '#999999'
 			},
 			enabled : true,
-			size : 0.5
+			size : 1
 		},
 		padding : 7,
 		width : 150
@@ -382,12 +389,24 @@ KineticUI.Input.prototype = {
 		window.addEventListener(KineticUI.Event.blur(), function(e){
 			if(e.target != self) self.blur();
 		});
-		window.addEventListener('keydown',function(e){
+		// window.addEventListener('keydown',function(e){
+		// 	self.keyDown(e);
+		// });
+		// window.addEventListener('keypress',function(e){
+		// 	self.keyPress(e);
+		// });
+
+		this._input = document.createElement('input');
+		this._input.id = KineticUI.uniqid();
+		this._input.style.position = 'absolute';
+		this._input.style.top = '-666px';
+		this._input.addEventListener('keydown',function(e){
 			self.keyDown(e);
 		});
-		window.addEventListener('keypress',function(e){
+		this._input.addEventListener('keypress',function(e){
 			self.keyPress(e);
 		});
+		document.getElementsByTagName('body')[0].appendChild(this._input);
 	},
 	batchDraw : function(){
 		if (this.parent && this.parent.batchDraw) {
@@ -454,6 +473,7 @@ KineticUI.Input.prototype = {
 				break;
 		}
 		this.text(str);
+		this._input.value = '';
 	},
 	keyPress : function(e){
 		if (!this.focused) return;
@@ -471,15 +491,18 @@ KineticUI.Input.prototype = {
 		if (letter) {
 			str += charStr;
 			this.text(str);
+			this._input.value = '';
 		}
 	},
 	disable : function(){
 		this.disabled = true;
 		this.focused = false;
+		this._input.disabled = true;
 		this.colorScheme('disabled');
 	},
 	enable : function(){
 		this.disabled = false;
+		this._input.disabled = false;
 		this.colorScheme('normal');
 	},
 	text : function(str){
@@ -499,6 +522,7 @@ KineticUI.Input.prototype = {
 		this.colorScheme('focus');
 		this._placeholder.hide();
 		this.focused = true;
+		this._input.focus();
 	},
 	blur : function(){
 		if (this.hovered)
@@ -510,6 +534,7 @@ KineticUI.Input.prototype = {
 				this.colorScheme('normal');
 		if (this.text() === '') this._placeholder.show();
 		this._cursor.hide();
+		this._input.blur();
 		this.focused = false;
 	}
 };

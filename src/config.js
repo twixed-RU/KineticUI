@@ -89,7 +89,7 @@ KineticUI.Config = {
 				disabled : '#999999'
 			},
 			enabled : true,
-			size : 0.5
+			size : 1
 		},
 		padding : 7,
 		width : 150
