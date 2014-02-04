@@ -1,3 +1,6 @@
+// We really need this thing to send GLOBAL ui event messages.
+// It might not be nicely done but it does its job so far
+
 KineticUI.Event = {
 	_blur : null,
 	blur : function(object){

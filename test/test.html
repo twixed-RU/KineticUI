@@ -14,31 +14,36 @@
 		var layer = new Kinetic.Layer();
 		stage.add(layer);
 
-		var button_1 = new KineticUI.Button({text:'Disable >', width:250});
+		var button_1 = new KineticUI.Button({text:'Disable >', width:250, x:5});
 		button_1.click = function(){
 			if (button_2.disabled){
 				button_1.text('Disable >');
 				button_2.enable();
 				input_1.enable();
+				slide_1.enable();
 			} else {
 				button_1.text('Enable >');
 				button_2.disable();
 				input_1.disable();
+				slide_1.disable();
 			}
 		};
 		layer.add(button_1);
 
-		var button_2 = new KineticUI.Button({text:'Button', x:button_1.width() + 5});
+		var button_2 = new KineticUI.Button({text:'Button', x:button_1.width() + 10});
 		button_2.click = function(){
 			if (console && console.log) console.log('Button click');
 		};
 		layer.add(button_2);
 
-		var input_1 = new KineticUI.Input({placeholder:'First text input', width:button_1.width() + button_2.width() + 5, y:button_1.height() + 5});
+		var input_1 = new KineticUI.Input({placeholder:'First text input', width:button_1.width() + button_2.width() + 5, x:5, y:button_1.height() + 5});
 		layer.add(input_1);
 
-		var input_2 = new KineticUI.Input({placeholder:'Second text input', width:input_1.width(), y:input_1.position().y + input_1.height() + 5});
+		var input_2 = new KineticUI.Input({placeholder:'Second text input', width:input_1.width(), x:5, y:input_1.position().y + input_1.height() + 5});
 		layer.add(input_2);
+
+		var slide_1 = new KineticUI.Slide({x:5, y:input_2.position().y + input_2.height() + 5});
+		layer.add(slide_1);
 
 		stage.batchDraw();
 	</script>

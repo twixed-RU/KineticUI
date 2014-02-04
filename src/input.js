@@ -173,19 +173,13 @@ KineticUI.Input.prototype = {
 		this.text(str);
 		this._input.value = str;
 	},
-	keyPress : function(e){ // somehow we need a separate event handler here
+	keyPress : function(e){ // somehow we need a separate event handler here to catch printable characters
 		if (!this.focused) return;
 		e = e || window.event;
 		var key = e.keyCode || e.which;
 		var charStr = String.fromCharCode(key);
 		var letter = (e.charCode && !e.altKey && !e.ctrlKey);
 		var str = this.text();
-		switch(key) {
-			case 8 : // backspace
-				str = str.substring(0, str.length - 1);
-				KineticUI.preventEvent(e);
-				break;
-		}
 		if (letter) {
 			str += charStr;
 			this.text(str);

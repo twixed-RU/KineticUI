@@ -93,6 +93,46 @@ KineticUI.Config = {
 		},
 		padding : 7,
 		width : 150
+	},
+
+	slide : {
+		fill : {
+			on : {
+				startPoint: {x:0, y:15},
+				endPoint: {x:0, y:17},
+				colorStops: [0, '#F3B931', 1, '#E6951D']
+			},
+			off : {
+				startPoint:{x:0, y:15},
+				endPoint: {x:0, y:17},
+				colorStops: [0, '#FAFAFA', 1, '#E9E9E9']
+			},
+			disabled : {
+				startPoint: {x:0, y:15},
+				endPoint: {x:0, y:17},
+				colorStops: [0, '#929292', 1, '#818181']
+			}
+		},
+		height : 32,
+		pin : {
+			fill : {
+				colorStops: [0, '#E0E0E0', 0.25, '#DDDDDD', 1, '#FFFFFF']
+			},
+			stroke : {
+				color : '#555555',
+				enabled : true,
+				size : 1
+			}
+		},
+		stroke : {
+			color : {
+				normal : '#555555',
+				disabled : '#999999'
+			},
+			enabled : true,
+			size : 1
+		},
+		width : 64		
 	}
 
 };
