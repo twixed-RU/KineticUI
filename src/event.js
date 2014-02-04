@@ -6,7 +6,7 @@ KineticUI.Event = {
 			return;
 		} else
 			if (object) {
-				this._blur.target = object;
+				this._blur.object = object;
 				window.dispatchEvent(this._blur);
 			} else
 				return this._blur.type;

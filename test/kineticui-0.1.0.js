@@ -179,7 +179,7 @@ KineticUI.Event = {
 			return;
 		} else
 			if (object) {
-				this._blur.target = object;
+				this._blur.object = object;
 				window.dispatchEvent(this._blur);
 			} else
 				return this._blur.type;
@@ -368,7 +368,6 @@ KineticUI.Input.prototype = {
 				} else {
 					this.target._cursor.show();
 				}
-				// this.target.update();
 				this.target.batchDraw();
 			}
 		});
@@ -387,24 +386,27 @@ KineticUI.Input.prototype = {
 		this.on('mouseup touchend',this.mouseUp);
 
 		window.addEventListener(KineticUI.Event.blur(), function(e){
-			if(e.target != self) self.blur();
+			if(e.object != self) self.blur();
 		});
-		// window.addEventListener('keydown',function(e){
-		// 	self.keyDown(e);
-		// });
-		// window.addEventListener('keypress',function(e){
-		// 	self.keyPress(e);
-		// });
 
 		this._input = document.createElement('input');
 		this._input.id = KineticUI.uniqid();
 		this._input.style.position = 'absolute';
+		this._input.style.border = 'none';
+		this._input.style.height = '1px';
+		this._input.style.width = '1px';
 		this._input.style.top = '-666px';
 		this._input.addEventListener('keydown',function(e){
 			self.keyDown(e);
 		});
 		this._input.addEventListener('keypress',function(e){
 			self.keyPress(e);
+		});
+		this._input.addEventListener('focus',function(e){
+			self.setFocus();
+		});
+		this._input.addEventListener('blur',function(e){
+			if (self.focused) self.blur();
 		});
 		document.getElementsByTagName('body')[0].appendChild(this._input);
 	},
@@ -473,16 +475,16 @@ KineticUI.Input.prototype = {
 				break;
 		}
 		this.text(str);
-		this._input.value = '';
+		this._input.value = str;
 	},
-	keyPress : function(e){
+	keyPress : function(e){ // somehow we need a separate event handler here
 		if (!this.focused) return;
 		e = e || window.event;
 		var key = e.keyCode || e.which;
 		var charStr = String.fromCharCode(key);
 		var letter = (e.charCode && !e.altKey && !e.ctrlKey);
 		var str = this.text();
-		switch(key) { // somehow we need a separate event handler here
+		switch(key) {
 			case 8 : // backspace
 				str = str.substring(0, str.length - 1);
 				KineticUI.preventEvent(e);
@@ -491,7 +493,7 @@ KineticUI.Input.prototype = {
 		if (letter) {
 			str += charStr;
 			this.text(str);
-			this._input.value = '';
+			this._input.value = str;
 		}
 	},
 	disable : function(){
@@ -506,23 +508,28 @@ KineticUI.Input.prototype = {
 		this.colorScheme('normal');
 	},
 	text : function(str){
-		if (str !== undefined) {
+		if (str === undefined) {
+			return this._text.text();
+		} else  {
 			if (str === '' && !this.focused)
 				this._placeholder.show();
 			else
 				this._placeholder.hide();
 			this._text.text(str);
 			this.batchDraw();
-		} else  {
-			return this._text.text();
+			return this
 		}
 	},
-	focus : function(){
+	setFocus : function(){
 		KineticUI.Event.blur(this);
 		this.colorScheme('focus');
 		this._placeholder.hide();
 		this.focused = true;
+		this._input.value = this.text();
+	},
+	focus : function(){
 		this._input.focus();
+		return this;
 	},
 	blur : function(){
 		if (this.hovered)
@@ -536,6 +543,15 @@ KineticUI.Input.prototype = {
 		this._cursor.hide();
 		this._input.blur();
 		this.focused = false;
+		return this;
+	},
+	tabIndex : function(value){
+		if (value === undefined) {
+			return this._input.tabIndex;
+		} else {
+			this._input.tabIndex = value;
+			return this;
+		}
 	}
 };
 
